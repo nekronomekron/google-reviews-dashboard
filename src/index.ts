@@ -9,7 +9,7 @@ function extractPlaceIdFromURI(uri: string): string {
     return ''
 }
 
-const browser = await puppeteer.launch({ headless: false })
+const browser = await puppeteer.launch({ headless: true })
 const page = await browser.newPage()
 
 const uri = `https://www.google.com/maps/search/${encodeURI('restaurant 84036 Landshut')}?hl=de`
@@ -34,8 +34,6 @@ let reachedEnd = false
 const maxScrollAttempts = 400
 for (let attempt = 0; attempt < maxScrollAttempts; attempt += 1) {
     reachedEnd = await page.$eval('div[role="feed"]', feedEl => {
-        return true
-
         const endSpan = Array.from(feedEl.querySelectorAll('span')).find(
             span =>
                 span.textContent?.trim() === 'Das Ende der Liste ist erreicht.'
