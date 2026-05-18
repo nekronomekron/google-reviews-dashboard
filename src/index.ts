@@ -1,48 +1,90 @@
 import puppeteer from 'puppeteer'
-// Or import puppeteer from 'puppeteer-core';
 
-// Launch the browser and open a new blank page.
-const browser = await puppeteer.launch()
+function extractPlaceIdFromURI(uri: string): string {
+    const decodedUri = decodeURIComponent(uri)
+    const matches = decodedUri.match(/!1s([^!/?&]+)/)
+
+    if (matches && matches.length > 1) return matches[1]!.trim()
+
+    return ''
+}
+
+const browser = await puppeteer.launch({ headless: false })
 const page = await browser.newPage()
 
 const uri = `https://www.google.com/maps/search/${encodeURI('restaurant 84036 Landshut')}?hl=de`
+await page.goto(uri, { waitUntil: 'networkidle0' })
 
-// Navigate the page to a URL.
-await page.goto(uri)
+const acceptButton = await page.locator('::-p-aria(Alle akzeptieren)')
+if (acceptButton) {
+    await Promise.all([
+        page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 15000 }),
+        acceptButton.click(),
+    ])
+} else {
+    console.warn('Accept button not found; continuing without redirect wait.')
+}
 
-// Set screen size.
-// await page.setViewport({ width: 1080, height: 1024 })
+const feed = await page.waitForSelector('div[role="feed"]', { timeout: 15000 })
+if (!feed) {
+    throw new Error('Feed container not found')
+}
 
-// Open the search menu using the keyboard.
-// await page.keyboard.press('/')
+let reachedEnd = false
+const maxScrollAttempts = 400
+for (let attempt = 0; attempt < maxScrollAttempts; attempt += 1) {
+    reachedEnd = await page.$eval('div[role="feed"]', feedEl => {
+        return true
 
-// Type into search box using accessible input name.
-// await page.locator('::-p-aria(Suche)').fill('automate beyond recorder')
+        const endSpan = Array.from(feedEl.querySelectorAll('span')).find(
+            span =>
+                span.textContent?.trim() === 'Das Ende der Liste ist erreicht.'
+        )
+        if (endSpan) {
+            return true
+        }
+        feedEl.scrollBy({ top: 1000 })
+        return false
+    })
 
-// // Wait and click on first result.
-// await page.locator('.devsite-result-item-link').click()
+    if (reachedEnd) {
+        break
+    }
 
-// // Locate the full title with a unique string.
-// const textSelector = await page
-//     .locator('::-p-text(Customize and automate)')
-//     .waitHandle()
-// const fullTitle = await textSelector?.evaluate(el => el.textContent)
+    await new Promise(function (resolve) {
+        setTimeout(resolve, 750)
+    })
+}
 
-// // Print the full title.
-// console.log('The title of this blog post is "%s".', fullTitle)
+if (!reachedEnd) {
+    throw new Error('End-of-list marker not found after scrolling')
+}
 
-// const test = await page.waitForSelector("xpath///div[@role='article']")
-const test = await page.$$eval(
-    '//div[@role="feed"]',
-    elements => elements.length
+console.log('Found "Das Ende der Liste ist erreicht." in the feed')
+
+const placeElements = await page.$$eval(
+    'a[href*="https://www.google.com/maps/place/"]',
+    elements =>
+        elements
+            .map(el => {
+                return {
+                    name: el.getAttribute('aria-label'),
+                    uri: el.href,
+                }
+            })
+            .filter(place => place.name !== null)
 )
 
-//  elements =>
-//     elements.map(div => div.getHTML())
-// )
+const discoveries = [
+    ...placeElements.map(place => {
+        return {
+            ...place,
+            id: extractPlaceIdFromURI(place.uri),
+        }
+    }),
+]
 
-// const test = await page.locator('::-p-aria([role="button"])').waitHandle()
-
-console.log(test)
+// .filter((label): label is string => label !== null)
+console.log(discoveries)
 
 await browser.close()
