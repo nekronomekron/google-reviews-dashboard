@@ -87,7 +87,10 @@ export class DiscoverPlaces {
                     if (endSpan) {
                         return true
                     }
-                    feedEl.scrollBy({ top: 1000 })
+                    feedEl.scrollBy({
+                        top: Math.random() * 1000 + 500,
+                        behavior: 'smooth',
+                    })
                     return false
                 },
                 config
