@@ -1,0 +1,65 @@
+{
+    "general": {
+        "consentAcceptButtonSelector": "::-p-aria(Alle akzeptieren)",
+        "feedEndIndicator": "Das Ende der Liste ist erreicht."
+    },
+
+    "scraping": {
+        "postcodes": [
+            {
+                "postcode": "84030",
+                "city": "Landshut"
+            },
+            {
+                "postcode": "84032",
+                "city": "Landshut"
+            },
+            {
+                "postcode": "84028",
+                "city": "Landshut"
+            },
+            {
+                "postcode": "84034",
+                "city": "Landshut"
+            },
+            {
+                "postcode": "84036",
+                "city": "Landshut"
+            }
+        ],
+        "queries": [
+            "restaurant",
+            "café",
+            "imbiss",
+            "pizzeria",
+            "bäckerei",
+            "döner",
+            "burger",
+            "sushi",
+            "schnitzel",
+            "frühstück",
+            "brunch",
+            "bar",
+            "kneipe",
+            "pub",
+            "biergarten",
+            "brauerei",
+            "cocktail bar",
+            "lounge",
+            "weinstube",
+            "club",
+            "nachtclub",
+            "diskothek",
+            "hotel",
+            "friseur",
+            "barbier",
+            "barbershop",
+            "fitnessstudio",
+            "fitness",
+            "supermarkt",
+            "metzgerei",
+            "apotheke",
+            "tankstelle"
+        ]
+    }
+}

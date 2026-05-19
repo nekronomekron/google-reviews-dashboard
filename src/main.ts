@@ -1,4 +1,5 @@
 import { Command } from 'commander'
+import { DiscoverPlaces } from './scraping/discover-places.ts'
 
 const program = new Command()
 
@@ -14,9 +15,9 @@ program
     .description(
         'Discover places in using the zip codes from the configuration file'
     )
-    .action((str, options) => {
-        const limit = options.first ? 1 : undefined
-        console.log(str.split(options.separator, limit))
+    .action(async () => {
+        const scraper = new DiscoverPlaces()
+        await scraper.discover()
     })
 
 program.parse()
