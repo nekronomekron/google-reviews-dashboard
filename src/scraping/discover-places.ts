@@ -65,6 +65,10 @@ export class DiscoverPlaces {
         if (fs.existsSync(this._filePath)) {
             const data = fs.readFileSync(this._filePath, 'utf8')
             this._discoveries = JSON.parse(data)
+
+            console.log(
+                `Loaded ${Object.keys(this._discoveries).length} discoveries from ${this._filePath}.`
+            )
         } else {
             console.warn(
                 `File ${this._filePath} does not exist. Starting with empty discoveries.`
