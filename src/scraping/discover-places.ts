@@ -54,7 +54,7 @@ export class DiscoverPlaces {
                 })
 
                 await page.close()
-                this.save()
+                await this.save()
             }
         }
 
@@ -72,13 +72,13 @@ export class DiscoverPlaces {
         }
     }
 
-    private save() {
+    private async save() {
         const dir = this._filePath.substring(0, this._filePath.lastIndexOf('/'))
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true })
         }
 
-        fs.writeFile(
+        await fs.writeFile(
             this._filePath,
             JSON.stringify(this._discoveries, null, 4),
             'utf8',
@@ -128,7 +128,7 @@ export class DiscoverPlaces {
             if (!feedEndIndicator) {
                 await page.evaluate(feed => {
                     feed.scrollBy({
-                        top: Math.random() * 1000 + 500,
+                        top: Math.random() * 2000 - 300,
                         behavior: 'smooth',
                     })
                 }, feedEl)

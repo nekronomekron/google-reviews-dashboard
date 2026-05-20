@@ -133,8 +133,3 @@ export function generateRandomUserAgent(
 
     return ''
 }
-
-// Example usage
-for (let i = 0; i < 5; i++) {
-    console.log(generateRandomUserAgent())
-}
