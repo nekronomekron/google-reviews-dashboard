@@ -31,7 +31,8 @@
         "rewriteRelativeImportExtensions": true,
 
         // Include modern ECMAScript (ES2022) and DOM APIs for frontend
-        "lib": ["ES2022", "DOM"] // Include ES2022 features and DOM APIs for frontend development
+        "lib": ["ES2022", "DOM"], // Include ES2022 features and DOM APIs for frontend development
+        "types": ["node"] // Include Node.js type definitions for backend development
         // Uncomment this for backend code without DOM APIs
         /* "lib": ["ES2022"] */
     },

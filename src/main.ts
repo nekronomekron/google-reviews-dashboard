@@ -18,6 +18,8 @@ program
     .action(async () => {
         const scraper = new DiscoverPlaces()
         await scraper.discover()
+
+        scraper.saveDiscoveriesToFile('./output/discoveries.json')
     })
 
 program.parse()

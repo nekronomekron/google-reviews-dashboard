@@ -20,9 +20,7 @@ export async function gotoPage(browser: Browser, uri: string): Promise<Page> {
 
     await page.goto(uri, { waitUntil: 'networkidle0' })
 
-    const acceptButton = await page.$(
-        config.general.consentAcceptButtonSelector
-    )
+    const acceptButton = await page.$(config.selectors.consentAcceptButton)
     if (acceptButton) {
         await Promise.all([
             page.waitForNavigation({

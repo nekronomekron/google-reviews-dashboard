@@ -1,7 +1,9 @@
 {
-    "general": {
-        "consentAcceptButtonSelector": "::-p-aria(Alle akzeptieren)",
-        "feedEndIndicator": "Das Ende der Liste ist erreicht."
+    "selectors": {
+        "consentAcceptButton": "::-p-aria(Alle akzeptieren)",
+
+        "feedContainer": "::-p-xpath(//div[@role=\"feed\"])",
+        "feedEndIndicator": "::-p-xpath(//span[text()=\"Das Ende der Liste ist erreicht.\"])"
     },
 
     "scraping": {
