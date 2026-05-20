@@ -4,22 +4,31 @@ import config from '../config.json' with { type: 'json' }
 import fs from 'fs'
 
 export class DiscoverPlaces {
+    private _filePath: string
+
     private _discoveries: {
         [id: string]: { name: string; uri: string; queries: string[] }
     } = {}
 
-    constructor() {}
+    constructor(filePath: string) {
+        this._filePath = filePath
 
-    async discover() {
+        this.load()
+    }
+
+    async discover(queries?: string[], postcodes?: string[]) {
         const browser = await initializeBrowser()
 
-        for (const postcode of config.scraping.postcodes) {
-            for (const query of config.scraping.queries) {
+        const postcodesToUse = postcodes || config.scraping.postcodes
+        const queriesToUse = queries || config.scraping.queries
+
+        for (const postcode of postcodesToUse) {
+            for (const query of queriesToUse) {
                 console.log(
-                    `Discovering places for postcode [${postcode.postcode} ${postcode.city}] and query ${query}...`
+                    `Discovering places for postcode [${postcode}] and query ${query}...`
                 )
 
-                const searchString = `${query} ${postcode.postcode} ${postcode.city}`
+                const searchString = `${query} ${postcode}`
                 const uri = `https://www.google.com/maps/search/${encodeURI(searchString)}?hl=de`
 
                 const page = await gotoPage(browser, uri)
@@ -38,24 +47,43 @@ export class DiscoverPlaces {
                             }
                         }
 
-                        this._discoveries[id].queries.push(query)
+                        if (!this._discoveries[id].queries.includes(query)) {
+                            this._discoveries[id].queries.push(query)
+                        }
                     }
                 })
 
                 await page.close()
+                this.save()
             }
         }
 
         await closeBrowser(browser)
     }
 
-    saveDiscoveriesToFile(filePath: string) {
+    private load() {
+        if (fs.existsSync(this._filePath)) {
+            const data = fs.readFileSync(this._filePath, 'utf8')
+            this._discoveries = JSON.parse(data)
+        } else {
+            console.warn(
+                `File ${this._filePath} does not exist. Starting with empty discoveries.`
+            )
+        }
+    }
+
+    private save() {
+        const dir = this._filePath.substring(0, this._filePath.lastIndexOf('/'))
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true })
+        }
+
         fs.writeFile(
-            filePath,
+            this._filePath,
             JSON.stringify(this._discoveries, null, 4),
             'utf8',
             () => {
-                console.log(`Data written to ${filePath} as JSON.`)
+                console.log(`Data written to ${this._filePath} as JSON.`)
             }
         )
     }

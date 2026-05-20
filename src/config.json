@@ -8,26 +8,11 @@
 
     "scraping": {
         "postcodes": [
-            {
-                "postcode": "84030",
-                "city": "Landshut"
-            },
-            {
-                "postcode": "84032",
-                "city": "Landshut"
-            },
-            {
-                "postcode": "84028",
-                "city": "Landshut"
-            },
-            {
-                "postcode": "84034",
-                "city": "Landshut"
-            },
-            {
-                "postcode": "84036",
-                "city": "Landshut"
-            }
+            "84030 Landshut",
+            "84032 Landshut",
+            "84028 Landshut",
+            "84034 Landshut",
+            "84036 Kumhausen"
         ],
         "queries": [
             "restaurant",

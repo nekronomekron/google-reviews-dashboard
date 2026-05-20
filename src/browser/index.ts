@@ -1,10 +1,10 @@
 import puppeteer, { Browser, Page } from 'puppeteer'
 
 import config from '../config.json' with { type: 'json' }
-import UserAgent from 'user-agents'
+import { generateRandomUserAgent } from '../utils/agents.ts'
 
 export async function initializeBrowser(): Promise<Browser> {
-    const browser = await puppeteer.launch({ headless: false })
+    const browser = await puppeteer.launch({ headless: true })
     return browser
 }
 
@@ -14,9 +14,7 @@ export async function closeBrowser(browser: Browser): Promise<void> {
 
 export async function gotoPage(browser: Browser, uri: string): Promise<Page> {
     const page = await browser.newPage()
-
-    const userAgent = new UserAgent({ deviceCategory: 'desktop' })
-    await page.setUserAgent(userAgent.toString())
+    await page.setUserAgent(generateRandomUserAgent('windows', 'chrome'))
 
     await page.goto(uri, { waitUntil: 'networkidle0' })
 

@@ -15,11 +15,22 @@ program
     .description(
         'Discover places in using the zip codes from the configuration file'
     )
-    .action(async () => {
-        const scraper = new DiscoverPlaces()
-        await scraper.discover()
-
-        scraper.saveDiscoveriesToFile('./output/discoveries.json')
+    .option(
+        '-o, --output <file>',
+        'Output file for discoveries',
+        './output/discoveries.json'
+    )
+    .option(
+        '-p, --postcodes <string...>',
+        'List of postcodes to discover places for'
+    )
+    .option(
+        '-q, --queries <string...>',
+        'List of queries to discover places for'
+    )
+    .action(async options => {
+        const scraper = new DiscoverPlaces(options.output)
+        await scraper.discover(options.queries, options.postcodes)
     })
 
 program.parse()
