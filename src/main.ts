@@ -28,8 +28,14 @@ program
         '-q, --queries <string...>',
         'List of queries to discover places for'
     )
+    .option(
+        '-r, --reset',
+        'Reset already processed discovery files and restart from scratch',
+        false
+    )
+
     .action(async options => {
-        const scraper = new DiscoverPlaces(options.output)
+        const scraper = new DiscoverPlaces(options.output, options.reset)
         await scraper.discover(options.queries, options.postcodes)
     })
 

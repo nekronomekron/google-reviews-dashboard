@@ -12,10 +12,8 @@ export async function closeBrowser(browser: Browser): Promise<void> {
     await browser.close()
 }
 
-export async function gotoPage(browser: Browser, uri: string): Promise<Page> {
-    const page = await browser.newPage()
-    await page.setUserAgent(generateRandomUserAgent('windows'))
-
+export async function gotoPage(page: Page, uri: string): Promise<Page> {
+    await page.setUserAgent(generateRandomUserAgent())
     await page.goto(uri, { waitUntil: 'networkidle0' })
 
     const acceptButton = await page.$(config.selectors.consentAcceptButton)

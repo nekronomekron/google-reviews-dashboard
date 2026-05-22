@@ -2,18 +2,32 @@ import type { Page } from 'puppeteer'
 import { closeBrowser, gotoPage, initializeBrowser } from '../browser/index.ts'
 import config from '../config.json' with { type: 'json' }
 import fs from 'fs'
+import { StateManager } from '../utils/state.manager.ts'
 
 export class DiscoverPlaces {
+    static STATE_KEY = 'discoveryPlaces'
+
+    private _stateManager: StateManager
+
+    private _state: { [postcode: string]: string[] } = {}
+
     private _filePath: string
 
     private _discoveries: {
         [id: string]: { name: string; uri: string; queries: string[] }
     } = {}
 
-    constructor(filePath: string) {
+    constructor(filePath: string, reset: boolean) {
+        this._stateManager = new StateManager()
         this._filePath = filePath
 
-        this.load()
+        if (!reset) {
+            this.load()
+            this._state = this._stateManager.getState(
+                DiscoverPlaces.STATE_KEY,
+                this._state
+            )
+        }
     }
 
     async discover(queries?: string[], postcodes?: string[]) {
@@ -22,8 +36,21 @@ export class DiscoverPlaces {
         const postcodesToUse = postcodes || config.scraping.postcodes
         const queriesToUse = queries || config.scraping.queries
 
+        const page = await browser.newPage()
+
         for (const postcode of postcodesToUse) {
             for (const query of queriesToUse) {
+                if (!this._state[postcode]) {
+                    this._state[postcode] = []
+                }
+
+                if (this._state[postcode].includes(query)) {
+                    console.log(
+                        `Postcode [${postcode}] and query ${query} has already been processed. Skipping.`
+                    )
+                    continue
+                }
+
                 console.log(
                     `Discovering places for postcode [${postcode}] and query ${query}...`
                 )
@@ -31,7 +58,7 @@ export class DiscoverPlaces {
                 const searchString = `${query} ${postcode}`
                 const uri = `https://www.google.com/maps/search/${encodeURI(searchString)}?hl=de`
 
-                const page = await gotoPage(browser, uri)
+                await gotoPage(page, uri)
 
                 await this.scrollToEndOfFeed(page)
                 const placeElements =
@@ -53,11 +80,17 @@ export class DiscoverPlaces {
                     }
                 })
 
-                await page.close()
+                this._state[postcode].push(query)
+
+                await this._stateManager.setState(
+                    DiscoverPlaces.STATE_KEY,
+                    this._state
+                )
                 await this.save()
             }
         }
 
+        await page.close()
         await closeBrowser(browser)
     }
 
