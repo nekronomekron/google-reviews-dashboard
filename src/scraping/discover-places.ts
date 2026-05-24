@@ -152,7 +152,8 @@ export class DiscoverPlaces {
     private async scrollToEndOfFeed(page: Page) {
         const feedEl: any = await page.$(config.selectors.feedContainer)
         if (!feedEl) {
-            throw new Error('Feed container not found')
+            console.error('Feed container not found')
+            return
         }
 
         let reachedEnd = false

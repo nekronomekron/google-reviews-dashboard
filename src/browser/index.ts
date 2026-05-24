@@ -13,7 +13,11 @@ export async function closeBrowser(browser: Browser): Promise<void> {
 }
 
 export async function gotoPage(page: Page, uri: string): Promise<Page> {
-    await page.setUserAgent(generateRandomUserAgent())
+    const userAgent = generateRandomUserAgent('windows', 'chrome')
+
+    console.log(`Using user agent: ${userAgent}`)
+
+    await page.setUserAgent(userAgent)
     await page.goto(uri, { waitUntil: 'networkidle0' })
 
     const acceptButton = await page.$(config.selectors.consentAcceptButton)
